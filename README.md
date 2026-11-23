@@ -88,9 +88,9 @@ Keep drop sections (`plank`, `gap`) on straight stretches and keep other parts o
 
 ## Leaderboard
 
-Serverless functions in `api/` (Node runtime, TypeScript) with Upstash Redis (REST) as the store, behind a `ScoreStore` interface with `UpstashStore` and `MemoryStore` adapters. Without Upstash variables the API uses `MemoryStore` automatically when running locally; on Vercel it answers `503 not_configured` (an in-memory store does not survive across serverless instances) and the game simply shows "Leaderboard offline".
+Serverless functions in `api/` (Node runtime, TypeScript) with Neon (serverless Postgres) as the store, behind a `ScoreStore` interface with `NeonStore` and `MemoryStore` adapters. Without `DATABASE_URL` the API uses `MemoryStore` automatically when running locally; on Vercel it answers `503 not_configured` (an in-memory store does not survive across serverless instances) and the game simply shows "Leaderboard offline".
 
-Data model: one sorted set per level and scope, `lb:{levelId}:all` and `lb:{levelId}:week:{ISO-week}` (score = best time in ms, `ZADD ... LT` keeps only each player's best, weekly keys expire after 14 days), and a hash `player:{id}` with the nickname. Identity is an anonymous random UUID in `localStorage` plus a nickname (3-16 chars, trimmed, blocklist, no URLs). No accounts, no personal data. The API never returns player ids.
+Data model: one ranked set per level and scope, keyed `lb:{levelId}:all` and `lb:{levelId}:week:{ISO-week}` (rows in table `lb_scores`; score = best time in ms; an upsert that only lowers the score keeps each player's best; weekly rows expire after 14 days), and `player:{id}` rows in `lb_hashes` with the nickname. Tables are created automatically on first use. Identity is an anonymous random UUID in `localStorage` plus a nickname (3-16 chars, trimmed, blocklist, no URLs). No accounts, no personal data. The API never returns player ids.
 
 Endpoints (JSON, CORS limited to the game's own origin and `https://games.khaw.cc`):
 
@@ -100,25 +100,25 @@ Endpoints (JSON, CORS limited to the game's own origin and `https://games.khaw.c
 
 ### Anti-cheat and its limits
 
-Server-side checks: valid signature, token not expired (6 h) and used once (Redis `SET NX`), level matches, `serverElapsed >= timeMs - 1500 ms`, `timeMs >= level.minPossibleTimeMs`, tokens capped at the level total, strict type/range checks, per-IP and per-player rate limits (10 submissions per minute; run starts 30/20 per minute) using Redis counters, and IPs are only stored as salted, truncated hashes in keys that expire after 60 s.
+Server-side checks: valid signature, token not expired (6 h) and used once (insert-if-absent row), level matches, `serverElapsed >= timeMs - 1500 ms`, `timeMs >= level.minPossibleTimeMs`, tokens capped at the level total, strict type/range checks, per-IP and per-player rate limits (10 submissions per minute; run starts 30/20 per minute) using expiring counter rows in Postgres, and IPs are only stored as salted, truncated hashes in keys that expire after 60 s.
 
 Known limits: the simulation runs in the browser, so a determined cheater can still produce a plausible-looking run (for example by scripting a perfect input stream or replaying the sim in real time with tooling) and the server cannot replay it. `inputLogHash` is only format-checked today; it exists so a future server-side replay verifier can be added without changing the client. The anti-cheat raises the bar (no instant or impossible times, no replays, no flooding); it does not make the board tamper-proof.
 
 ### Setup checklist (Vercel project)
 
 1. Create the Vercel project (framework preset Vite, root of this repo). Leave Git integration alone: `vercel.json` already disables it.
-2. Add the Upstash Redis integration from the Vercel Marketplace (it injects `KV_REST_API_URL` / `KV_REST_API_TOKEN`), or create a database at upstash.com and set the variables below by hand.
+2. Add the Neon integration from the Vercel Marketplace (it injects `DATABASE_URL` / `POSTGRES_URL`), or create a database at neon.tech and set `DATABASE_URL` by hand. No manual migration is needed.
 3. Add `LEADERBOARD_SECRET` (a long random string, e.g. `openssl rand -hex 32`) for Production.
 4. Redeploy (push to `main`, or run the Deploy workflow manually).
 
 ### Environment variables (Vercel project, not GitHub)
 
-| Variable                                              | Purpose                                                     |
-| ----------------------------------------------------- | ----------------------------------------------------------- |
-| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST credentials                              |
-| `KV_REST_API_URL` / `KV_REST_API_TOKEN`               | Same, as injected by the Marketplace integration (fallback) |
-| `LEADERBOARD_SECRET`                                  | HMAC secret for run tokens, also salts IP hashes            |
-| `ALLOWED_ORIGINS` (optional)                          | Extra comma-separated CORS origins                          |
+| Variable                     | Purpose                                           |
+| ---------------------------- | ------------------------------------------------- |
+| `DATABASE_URL`               | Neon Postgres connection string                   |
+| `POSTGRES_URL`               | Same, as injected by some integrations (fallback) |
+| `LEADERBOARD_SECRET`         | HMAC secret for run tokens, also salts IP hashes  |
+| `ALLOWED_ORIGINS` (optional) | Extra comma-separated CORS origins                |
 
 If anything is missing the app degrades gracefully: the game stays fully playable, scores stay in `localStorage`, and queued scores are retried when the API comes back.
 
@@ -185,5 +185,5 @@ Messages from the game to the parent: `{type:'pocket-rally:ready'}` and `{type:'
 
 ## Testing
 
-- Unit tests (Vitest): controller maths, track queries, hazards, autopilot completing every level, save, quality scaler, nickname rules, token signing, anti-cheat rules, rate limiting, API handlers against `MemoryStore`, `UpstashStore` protocol, and the deploy scripts with mocked Vercel responses.
+- Unit tests (Vitest): controller maths, track queries, hazards, autopilot completing every level, save, quality scaler, nickname rules, token signing, anti-cheat rules, rate limiting, API handlers against `MemoryStore`, `NeonStore` protocol, and the deploy scripts with mocked Vercel responses.
 - End-to-end (Playwright, Chromium): every level is completed by the autopilot on 390x844, 844x390, 820x1180, 1180x820, 1280x720 and 1920x1080 with no console errors and a non-blank canvas; screenshots go to `screenshots/`. Another test runs the autopilot in real time against the local API and checks that the rank appears on the results screen and in the leaderboard. Others cover the offline path and keyboard/mouse input. If your Chromium does not match the installed Playwright, set `PW_CHROMIUM_PATH`.

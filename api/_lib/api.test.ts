@@ -3,7 +3,8 @@ import { loadConfig, isAllowedOrigin, type ApiConfig } from './config'
 import { handle, type ApiRequest, type Route } from './handlers'
 import { hashIp } from './ratelimit'
 import { checkScore } from './rules'
-import { MemoryStore, UpstashStore, type Fetch } from './store'
+import { MemoryStore, NeonStore, type ScoreStore } from './store'
+import { PGlite } from '@electric-sql/pglite'
 import { signRunToken, verifyRunToken, TOKEN_MAX_AGE_MS } from './token'
 import { isoWeek } from './week'
 import { gardenLevel } from '../../src/levels/garden/config'
@@ -333,51 +334,63 @@ describe('CORS and configuration', () => {
     const local = loadConfig({})
     expect('store' in local && local.store.kind).toBe('memory')
     expect(loadConfig({ VERCEL: '1' })).toEqual({ error: 'not_configured' })
-    const withKv = loadConfig({
+    const neon = loadConfig({
       VERCEL: '1',
-      KV_REST_API_URL: 'https://x',
-      KV_REST_API_TOKEN: 't',
+      DATABASE_URL: 'postgres://u:p@host/db',
       LEADERBOARD_SECRET: 's',
     })
-    expect('store' in withKv && withKv.store.kind).toBe('upstash')
-    const upstash = loadConfig({
-      UPSTASH_REDIS_REST_URL: 'https://x',
-      UPSTASH_REDIS_REST_TOKEN: 't',
-      LEADERBOARD_SECRET: 's',
-    })
-    expect('store' in upstash && upstash.store.kind).toBe('upstash')
+    expect('store' in neon && neon.store.kind).toBe('neon')
+    const alt = loadConfig({ POSTGRES_URL: 'postgres://u:p@host/db', LEADERBOARD_SECRET: 's' })
+    expect('store' in alt && alt.store.kind).toBe('neon')
   })
 })
 
-describe('UpstashStore', () => {
-  it('speaks the REST protocol (ZADD LT CH, pipelines, NX)', async () => {
-    const calls: { url: string; body: unknown; auth: string }[] = []
-    const fake: Fetch = async (url, init) => {
-      const body = JSON.parse(init.body) as unknown
-      calls.push({ url, body, auth: init.headers.Authorization })
-      const cmd = Array.isArray(body) && !Array.isArray(body[0]) ? (body as string[]) : null
-      let result: unknown = 'OK'
-      if (url.endsWith('/pipeline'))
-        return {
-          ok: true,
-          status: 200,
-          json: async () => (body as unknown[]).map(() => ({ result: 1 })),
-        }
-      if (cmd?.[0] === 'ZADD') result = 1
-      if (cmd?.[0] === 'ZRANGE') result = ['a', '1000', 'b', '2000']
-      if (cmd?.[0] === 'SET') result = null
-      return { ok: true, status: 200, json: async () => ({ result }) }
-    }
-    const st = new UpstashStore('https://redis.example/', 'tok', fake)
-    expect(await st.zaddLt('lb:garden:all', 1234, 'p1')).toBe(true)
-    expect(calls[0].body).toEqual(['ZADD', 'lb:garden:all', 'LT', 'CH', 1234, 'p1'])
-    expect(calls[0].auth).toBe('Bearer tok')
-    expect(await st.zrange('k', 0, 1)).toEqual([
-      { member: 'a', score: 1000 },
-      { member: 'b', score: 2000 },
+// The same behaviour must hold on a real Postgres (PGlite) as on the memory store.
+describe.each([
+  ['memory', async () => new MemoryStore() as ScoreStore],
+  [
+    'neon (postgres)',
+    async () => {
+      const db = new PGlite()
+      return new NeonStore({
+        query: async (t, p) => ({ rows: (await db.query(t, p)).rows as Record<string, unknown>[] }),
+      }) as ScoreStore
+    },
+  ],
+])('ScoreStore contract: %s', (_name, make) => {
+  it('keeps the best score per member and ranks ascending with stable ties', async () => {
+    const s = await make()
+    expect(await s.zaddLt('k', 500, 'a')).toBe(true)
+    expect(await s.zaddLt('k', 600, 'a')).toBe(false)
+    expect(await s.zaddLt('k', 400, 'a')).toBe(true)
+    await s.zaddLt('k', 300, 'c')
+    await s.zaddLt('k', 400, 'b')
+    expect(await s.zrange('k', 0, -1)).toEqual([
+      { member: 'c', score: 300 },
+      { member: 'a', score: 400 },
+      { member: 'b', score: 400 },
     ])
-    expect(await st.setNx('used:x', 60)).toBe(false)
-    expect(await st.incr('rl:x', 60)).toBe(1)
-    expect(calls.at(-1)?.url).toBe('https://redis.example/pipeline')
+    expect(await s.zrange('k', 1, 1)).toEqual([{ member: 'a', score: 400 }])
+    expect(await s.zrank('k', 'b')).toBe(2)
+    expect(await s.zrank('k', 'zz')).toBeNull()
+    expect(await s.zscore('k', 'a')).toBe(400)
+    expect(await s.zcard('k')).toBe(3)
+  })
+  it('hashes, counters and set-if-absent flags', async () => {
+    const s = await make()
+    await s.hset('player:1', 'nick', 'Ann')
+    await s.hset('player:1', 'nick', 'Anna')
+    expect(await s.hgetMany(['player:1', 'player:2'], 'nick')).toEqual(['Anna', null])
+    expect(await s.incr('c', 60)).toBe(1)
+    expect(await s.incr('c', 60)).toBe(2)
+    expect(await s.setNx('f', 60)).toBe(true)
+    expect(await s.setNx('f', 60)).toBe(false)
+  })
+  it('expires sorted sets', async () => {
+    const s = await make()
+    await s.zaddLt('w', 100, 'a')
+    await s.expire('w', 0)
+    await new Promise((r) => setTimeout(r, 20))
+    expect(await s.zcard('w')).toBe(0)
   })
 })

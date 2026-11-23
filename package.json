@@ -16,9 +16,11 @@
     "thumbnail": "node scripts/make-thumbnail.mjs"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.2.1",
     "three": "^0.187.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.17",
     "@eslint/js": "^10.0.0",
     "@playwright/test": "^1.65.0",
     "@types/node": "^22.0.0",

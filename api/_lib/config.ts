@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto'
-import { MemoryStore, UpstashStore, type ScoreStore } from './store'
+import { MemoryStore, NeonStore, type ScoreStore } from './store'
 
 export interface Env {
   [key: string]: string | undefined
@@ -20,8 +20,7 @@ let memory: MemoryStore | null = null
 /** Build config from environment variables. Returns an error code when production is misconfigured. */
 export function loadConfig(env: Env): ApiConfig | { error: 'not_configured' } {
   const production = !!env.VERCEL || env.NODE_ENV === 'production'
-  const url = env.UPSTASH_REDIS_REST_URL || env.KV_REST_API_URL
-  const token = env.UPSTASH_REDIS_REST_TOKEN || env.KV_REST_API_TOKEN
+  const dbUrl = env.DATABASE_URL || env.POSTGRES_URL
   const configuredSecret = env.LEADERBOARD_SECRET
   const extraOrigins = (env.ALLOWED_ORIGINS ?? '')
     .split(',')
@@ -29,7 +28,7 @@ export function loadConfig(env: Env): ApiConfig | { error: 'not_configured' } {
     .filter(Boolean)
 
   let store: ScoreStore
-  if (url && token) store = new UpstashStore(url, token)
+  if (dbUrl) store = new NeonStore(dbUrl)
   else if (production) return { error: 'not_configured' }
   else store = memory ?? (memory = new MemoryStore())
 
