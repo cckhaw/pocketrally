@@ -117,12 +117,12 @@ export class ChaseCamera {
     boost: number,
     ceiling: number,
   ): void {
-    const back = 3.2
-    const up = 1.6
+    const back = 5.2
+    const up = 3.0
     // look-ahead: shift the look target sideways into turns
     const rx = -fz
     const rz = fx
-    const lookAhead = 7
+    const lookAhead = 9
     const bias = Math.max(-1.2, Math.min(1.2, curve * 55))
     this.desired.set(
       carPos.x - fx * back,
