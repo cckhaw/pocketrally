@@ -1,0 +1,84 @@
+name: Deploy (production)
+
+# Production deploys only, from main. Vercel's own Git integration is disabled in vercel.json,
+# so this workflow is the only way anything gets built or deployed.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || vars.VERCEL_TOKEN }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID || vars.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID || vars.VERCEL_PROJECT_ID }}
+  VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID || vars.VERCEL_TEAM_ID }}
+
+jobs:
+  deploy:
+    # workflow_dispatch can be started from any branch; only main may deploy.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check configuration (values are never printed)
+        run: |
+          echo "::add-mask::$VERCEL_TOKEN"
+          missing=0
+          for name in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!name}" ]; then echo "::error::$name is not set (add it as a secret or variable)"; missing=1; fi
+          done
+          exit $missing
+
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install, lint, typecheck, test and build
+        run: |
+          npm ci
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run build
+
+      - name: Pull Vercel production settings
+        run: npx vercel@latest pull --yes --environment=production --token=$VERCEL_TOKEN
+
+      - name: Build for production
+        run: npx vercel@latest build --prod --token=$VERCEL_TOKEN
+
+      - name: Deploy prebuilt output to production
+        id: deploy
+        run: |
+          url=$(npx vercel@latest deploy --prebuilt --prod --token=$VERCEL_TOKEN)
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Deployment created: $url"
+
+      - name: Wait until the new deployment is live in production
+        id: wait
+        run: node scripts/wait-for-production.mjs "${{ steps.deploy.outputs.url }}"
+
+      - name: Remove old deployments (keeps only the new live one)
+        id: cleanup
+        if: success() && steps.wait.outcome == 'success' && steps.wait.outputs.deployment_id != ''
+        run: node scripts/cleanup-deployments.mjs "${{ steps.wait.outputs.deployment_id }}"
+
+      - name: Job summary
+        if: success()
+        run: |
+          {
+            echo "## Production deploy"
+            echo "- Deployment URL: ${{ steps.deploy.outputs.url }}"
+            echo "- Deployment id: ${{ steps.wait.outputs.deployment_id }}"
+            echo "- Production alias(es): ${{ steps.wait.outputs.aliases }}"
+            echo "- Old deployments removed: ${{ steps.cleanup.outputs.removed }}"
+          } >> "$GITHUB_STEP_SUMMARY"

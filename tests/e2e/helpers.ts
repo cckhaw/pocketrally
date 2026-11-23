@@ -10,6 +10,8 @@ export interface DebugState {
   tokens: number
   deaths: number
   speed: number
+  calls: number
+  triangles: number
 }
 
 declare global {

@@ -85,6 +85,7 @@ export class Game implements GameApi {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = THREE.PCFShadowMap
+    this.renderer.info.autoReset = false
     this.input = new Input(() => load().settings)
     this.input.onPause = () => {
       if (this.state === 'playing') this.pause()
@@ -126,6 +127,8 @@ export class Game implements GameApi {
     tokens: number
     deaths: number
     speed: number
+    calls: number
+    triangles: number
   } {
     const r = this.run
     return {
@@ -137,6 +140,8 @@ export class Game implements GameApi {
       tokens: r?.tokenCount ?? 0,
       deaths: r?.deaths ?? 0,
       speed: r?.car.speed ?? 0,
+      calls: this.renderer.info.render.calls,
+      triangles: this.renderer.info.render.triangles,
     }
   }
 
@@ -394,6 +399,7 @@ export class Game implements GameApi {
       this.frameCount = 0
     }
 
+    this.renderer.info.reset()
     if (this.state === 'countdown') this.tickCountdown(dt)
     else if (this.state === 'playing') this.tickPlaying(dt)
 
