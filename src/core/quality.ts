@@ -11,9 +11,33 @@ export interface QualityPreset {
 }
 
 export const PRESETS: Record<QualityLevel, QualityPreset> = {
-  low: { name: 'low', pixelRatioCap: 1, shadowSize: 512, particleScale: 0.35, post: false, bloom: false, msaa: 0 },
-  med: { name: 'med', pixelRatioCap: 1.5, shadowSize: 1024, particleScale: 0.7, post: true, bloom: true, msaa: 0 },
-  high: { name: 'high', pixelRatioCap: 2, shadowSize: 2048, particleScale: 1, post: true, bloom: true, msaa: 4 },
+  low: {
+    name: 'low',
+    pixelRatioCap: 1,
+    shadowSize: 512,
+    particleScale: 0.35,
+    post: false,
+    bloom: false,
+    msaa: 0,
+  },
+  med: {
+    name: 'med',
+    pixelRatioCap: 1.5,
+    shadowSize: 1024,
+    particleScale: 0.7,
+    post: true,
+    bloom: true,
+    msaa: 0,
+  },
+  high: {
+    name: 'high',
+    pixelRatioCap: 2,
+    shadowSize: 2048,
+    particleScale: 1,
+    post: true,
+    bloom: true,
+    msaa: 4,
+  },
 }
 
 const ORDER: QualityLevel[] = ['high', 'med', 'low']

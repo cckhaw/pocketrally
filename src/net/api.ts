@@ -41,7 +41,11 @@ async function once<T>(path: string, init: RequestInit | undefined, timeoutMs: n
 }
 
 /** Typed fetch with timeout and retry (network errors, 429 and 5xx) with exponential backoff. */
-export async function request<T>(path: string, init?: RequestInit, opts: { timeoutMs?: number; retries?: number } = {}): Promise<T> {
+export async function request<T>(
+  path: string,
+  init?: RequestInit,
+  opts: { timeoutMs?: number; retries?: number } = {},
+): Promise<T> {
   const retries = opts.retries ?? 2
   let attempt = 0
   for (;;) {
@@ -63,7 +67,10 @@ const json = (body: unknown): RequestInit => ({
 
 export const api = {
   startRun: (levelId: string, playerId: string) =>
-    request<RunStartResponse>('/api/run/start', json({ levelId, playerId }), { retries: 1, timeoutMs: 4000 }),
+    request<RunStartResponse>('/api/run/start', json({ levelId, playerId }), {
+      retries: 1,
+      timeoutMs: 4000,
+    }),
   submitScore: (body: {
     runToken: string
     timeMs: number

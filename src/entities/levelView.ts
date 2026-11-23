@@ -26,7 +26,11 @@ export interface LevelView {
 const tick = () => new Promise<void>((r) => setTimeout(r, 0))
 const P = makeTrackPoint()
 
-export function applyTheme(scene: THREE.Scene, level: LevelConfig, renderer: THREE.WebGLRenderer): void {
+export function applyTheme(
+  scene: THREE.Scene,
+  level: LevelConfig,
+  renderer: THREE.WebGLRenderer,
+): void {
   const th = level.theme
   const sky = skyTexture(th.skyTop, th.skyHorizon, th.skyBottom)
   scene.background = sky
@@ -95,7 +99,12 @@ export async function buildLevelView(
   }
   addCheckpointFlags(level, track, ctx)
   addFinishGate(level, track, ctx, checker, meshes.group)
-  const staticMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.7, metalness: 0.05, side: THREE.DoubleSide })
+  const staticMat = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    roughness: 0.7,
+    metalness: 0.05,
+    side: THREE.DoubleSide,
+  })
   const tris = batch.triangles
   const staticGroup = batch.build(staticMat)
   scene.add(staticGroup)
@@ -119,7 +128,11 @@ export async function buildLevelView(
   scene.add(coins)
   const coinPos = level.tokens.map((t) => {
     const p = track.at(t.s, P)
-    return new THREE.Vector3(p.x + p.nx * t.d, (track.ground(t.s, t.d) ?? 0) + (t.y ?? 0) + 0.9, p.z + p.nz * t.d)
+    return new THREE.Vector3(
+      p.x + p.nx * t.d,
+      (track.ground(t.s, t.d) ?? 0) + (t.y ?? 0) + 0.9,
+      p.z + p.nz * t.d,
+    )
   })
   const coinHeading = level.tokens.map((t) => {
     const p = track.at(t.s, P)

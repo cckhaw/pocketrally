@@ -30,9 +30,42 @@ tk.push(...tokenWave(b.s + 5, b.s + 70, 3.5, 10))
 b.straight(80)
 
 // 3. Rolling barrels
-hz.push({ kind: 'roller', model: 'barrel', s: b.s + 10, d: 0, amp: 8, speed: 13, period: 4.4, phase: 0, r: 1.4, side: 1 })
-hz.push({ kind: 'roller', model: 'barrel', s: b.s + 30, d: 0, amp: 8, speed: 13, period: 4.4, phase: 2.2, r: 1.4, side: -1 })
-hz.push({ kind: 'roller', model: 'barrel', s: b.s + 50, d: 0, amp: 8, speed: 14, period: 3.8, phase: 1, r: 1.4, side: 1 })
+hz.push({
+  kind: 'roller',
+  model: 'barrel',
+  s: b.s + 10,
+  d: 0,
+  amp: 8,
+  speed: 13,
+  period: 4.4,
+  phase: 0,
+  r: 1.4,
+  side: 1,
+})
+hz.push({
+  kind: 'roller',
+  model: 'barrel',
+  s: b.s + 30,
+  d: 0,
+  amp: 8,
+  speed: 13,
+  period: 4.4,
+  phase: 2.2,
+  r: 1.4,
+  side: -1,
+})
+hz.push({
+  kind: 'roller',
+  model: 'barrel',
+  s: b.s + 50,
+  d: 0,
+  amp: 8,
+  speed: 14,
+  period: 3.8,
+  phase: 1,
+  r: 1.4,
+  side: 1,
+})
 b.straight(70)
 checkpoints.push(Math.round(b.s))
 b.turn(-45, 85)
@@ -45,7 +78,12 @@ b.straight(45)
 seg.push({ type: 'ramp', s0: rampS, s1: rampS + 7, height: 2.1 })
 seg.push({ type: 'gap', s0: rampS + 7, s1: rampS + 20 })
 tk.push({ s: rampS + 11, d: 0, y: 3.2 }, { s: rampS + 16, d: 0, y: 3 })
-props.push({ kind: 'barrel', s: rampS + 7, d: -11, scale: 1.5 }, { kind: 'barrel', s: rampS + 7, d: 11, scale: 1.5 }, { kind: 'barrel', s: rampS + 20, d: -11, scale: 1.5 }, { kind: 'barrel', s: rampS + 20, d: 11, scale: 1.5 })
+props.push(
+  { kind: 'barrel', s: rampS + 7, d: -11, scale: 1.5 },
+  { kind: 'barrel', s: rampS + 7, d: 11, scale: 1.5 },
+  { kind: 'barrel', s: rampS + 20, d: -11, scale: 1.5 },
+  { kind: 'barrel', s: rampS + 20, d: 11, scale: 1.5 },
+)
 b.straight(35)
 
 // 5. Steel tank trench with a spinning fan
@@ -57,7 +95,10 @@ seg.push({ type: 'trench', s0: trenchA, s1: trenchB, wallHeight: 1.8 })
 hz.push({ kind: 'fan', model: 'fan', s: trenchA + 40, d: 0, amp: 3.6, speed: 3.2 })
 hz.push({ kind: 'fan', model: 'fan', s: trenchA + 80, d: 0, amp: 3.6, speed: -3.6 })
 hz.push({ kind: 'fan', model: 'fan', s: trenchA + 118, d: 0, amp: 3.6, speed: 3.4 })
-tk.push(...tokenLine(trenchA + 10, trenchA + 30, 0, 5), ...tokenLine(trenchA + 50, trenchA + 70, 4, 4))
+tk.push(
+  ...tokenLine(trenchA + 10, trenchA + 30, 0, 5),
+  ...tokenLine(trenchA + 50, trenchA + 70, 4, 4),
+)
 b.straight(20)
 checkpoints.push(Math.round(b.s))
 b.turn(40, 85)
@@ -75,7 +116,16 @@ b.turn(-40, 85)
 // 7. Swinging iron-hinged door and finale
 b.straight(30)
 hz.push({ kind: 'door', model: 'door', s: b.s + 15, d: 8, amp: 14, period: 4.6, phase: 0, side: 1 })
-hz.push({ kind: 'door', model: 'door', s: b.s + 60, d: -8, amp: 14, period: 4.6, phase: 2.3, side: -1 })
+hz.push({
+  kind: 'door',
+  model: 'door',
+  s: b.s + 60,
+  d: -8,
+  amp: 14,
+  period: 4.6,
+  phase: 2.3,
+  side: -1,
+})
 tk.push(...tokenLine(b.s + 25, b.s + 50, 0, 6))
 b.straight(100)
 boosts.push({ s: Math.round(b.s) - 30, d: 0 })

@@ -30,8 +30,30 @@ hz.push({ kind: 'stomp', model: 'foot', s: b.s + 15, d: -3, period: 4.6, phase: 
 hz.push({ kind: 'stomp', model: 'foot', s: b.s + 40, d: 3.5, period: 4.6, phase: 2.3, r: 2.4 })
 tk.push(...tokenLine(b.s + 24, b.s + 34, 0, 4), ...tokenLine(b.s + 48, b.s + 60, 0, 4))
 b.straight(70)
-hz.push({ kind: 'roller', model: 'ball', s: b.s - 15, d: 0, amp: 9, speed: 14, period: 4.4, phase: 0.5, r: 1.3, side: 1 })
-hz.push({ kind: 'roller', model: 'ball', s: b.s + 15, d: 0, amp: 9, speed: 14, period: 4.4, phase: 2.7, r: 1.3, side: -1 })
+hz.push({
+  kind: 'roller',
+  model: 'ball',
+  s: b.s - 15,
+  d: 0,
+  amp: 9,
+  speed: 14,
+  period: 4.4,
+  phase: 0.5,
+  r: 1.3,
+  side: 1,
+})
+hz.push({
+  kind: 'roller',
+  model: 'ball',
+  s: b.s + 15,
+  d: 0,
+  amp: 9,
+  speed: 14,
+  period: 4.4,
+  phase: 2.7,
+  r: 1.3,
+  side: -1,
+})
 b.straight(30)
 checkpoints.push(Math.round(b.s))
 
@@ -40,8 +62,29 @@ const holeS = b.s + 10
 b.straight(30)
 props.push({ kind: 'mouseHole', s: holeS, d: 0 })
 b.straight(40)
-hz.push({ kind: 'paw', model: 'paw', s: b.s - 10, d: 0, amp: 7, period: 4.2, phase: 1, r: 1.7, side: 1 })
-hz.push({ kind: 'roller', model: 'cat', s: b.s + 25, d: 0, amp: 10, speed: 22, period: 6, phase: 1, r: 1.6, side: -1 })
+hz.push({
+  kind: 'paw',
+  model: 'paw',
+  s: b.s - 10,
+  d: 0,
+  amp: 7,
+  period: 4.2,
+  phase: 1,
+  r: 1.7,
+  side: 1,
+})
+hz.push({
+  kind: 'roller',
+  model: 'cat',
+  s: b.s + 25,
+  d: 0,
+  amp: 10,
+  speed: 22,
+  period: 6,
+  phase: 1,
+  r: 1.6,
+  side: -1,
+})
 tk.push(...tokenWave(b.s, b.s + 50, 4, 9))
 b.straight(55)
 b.turn(-50, 80)
@@ -63,11 +106,46 @@ const hallA = b.s
 b.straight(110)
 const hallB = b.s
 b.width(18)
-for (let s = hallA + 5; s < hallB; s += 28) props.push({ kind: 'frame', s, d: -9.5, rot: Math.PI / 2 }, { kind: 'frame', s: s + 14, d: 9.5, rot: -Math.PI / 2 })
-hz.push({ kind: 'toddler', model: 'toddler', s: hallA + 40, d: 0, amp: 4, period: 5.2, phase: 0, r: 1.8 })
-hz.push({ kind: 'toddler', model: 'toddler', s: hallA + 85, d: 0, amp: 4, period: 4.8, phase: 2, r: 1.8 })
-hz.push({ kind: 'toddler', model: 'toddler', s: hallA + 125, d: 0, amp: 4, period: 5.0, phase: 1, r: 1.8 })
-tk.push(...tokenLine(hallA + 10, hallA + 30, 0, 5), ...tokenLine(hallA + 55, hallA + 75, 0, 5), ...tokenLine(hallA + 95, hallA + 115, 0, 5))
+for (let s = hallA + 5; s < hallB; s += 28)
+  props.push(
+    { kind: 'frame', s, d: -9.5, rot: Math.PI / 2 },
+    { kind: 'frame', s: s + 14, d: 9.5, rot: -Math.PI / 2 },
+  )
+hz.push({
+  kind: 'toddler',
+  model: 'toddler',
+  s: hallA + 40,
+  d: 0,
+  amp: 4,
+  period: 5.2,
+  phase: 0,
+  r: 1.8,
+})
+hz.push({
+  kind: 'toddler',
+  model: 'toddler',
+  s: hallA + 85,
+  d: 0,
+  amp: 4,
+  period: 4.8,
+  phase: 2,
+  r: 1.8,
+})
+hz.push({
+  kind: 'toddler',
+  model: 'toddler',
+  s: hallA + 125,
+  d: 0,
+  amp: 4,
+  period: 5.0,
+  phase: 1,
+  r: 1.8,
+})
+tk.push(
+  ...tokenLine(hallA + 10, hallA + 30, 0, 5),
+  ...tokenLine(hallA + 55, hallA + 75, 0, 5),
+  ...tokenLine(hallA + 95, hallA + 115, 0, 5),
+)
 b.turn(35, 80)
 checkpoints.push(Math.round(b.s))
 
@@ -76,7 +154,17 @@ const spillA = b.s + 10
 b.straight(45)
 seg.push({ type: 'surface', s0: spillA, s1: spillA + 40, surface: 'spill' })
 props.push({ kind: 'cereal', s: spillA + 8, d: -3 }, { kind: 'cereal', s: spillA + 26, d: 3 })
-hz.push({ kind: 'vacuum', model: 'vacuum', s: b.s + 40, d: 0, amp: 5, len: 8, period: 7, phase: 0, r: 1.8 })
+hz.push({
+  kind: 'vacuum',
+  model: 'vacuum',
+  s: b.s + 40,
+  d: 0,
+  amp: 5,
+  len: 8,
+  period: 7,
+  phase: 0,
+  r: 1.8,
+})
 tk.push(...tokenWave(b.s + 10, b.s + 90, 4, 12))
 b.straight(100)
 b.turn(-35, 90)

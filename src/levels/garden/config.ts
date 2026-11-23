@@ -25,11 +25,55 @@ const trenchB = b.s
 b.width(16)
 seg.push({ type: 'trench', s0: trenchA, s1: trenchB, wallHeight: 1.7 })
 hz.push(
-  { kind: 'roller', model: 'onionRoll', s: trenchA + 30, d: 0, amp: 5, speed: 11, period: 4.2, phase: 0, r: 1.3, side: 1 },
-  { kind: 'roller', model: 'onionRoll', s: trenchA + 62, d: 0, amp: 5, speed: 11, period: 4.2, phase: 1.5, r: 1.3, side: -1 },
-  { kind: 'roller', model: 'onionRoll', s: trenchA + 95, d: 0, amp: 5, speed: 12, period: 3.6, phase: 0.6, r: 1.3, side: 1 },
+  {
+    kind: 'roller',
+    model: 'onionRoll',
+    s: trenchA + 30,
+    d: 0,
+    amp: 5,
+    speed: 11,
+    period: 4.2,
+    phase: 0,
+    r: 1.3,
+    side: 1,
+  },
+  {
+    kind: 'roller',
+    model: 'onionRoll',
+    s: trenchA + 62,
+    d: 0,
+    amp: 5,
+    speed: 11,
+    period: 4.2,
+    phase: 1.5,
+    r: 1.3,
+    side: -1,
+  },
+  {
+    kind: 'roller',
+    model: 'onionRoll',
+    s: trenchA + 95,
+    d: 0,
+    amp: 5,
+    speed: 12,
+    period: 3.6,
+    phase: 0.6,
+    r: 1.3,
+    side: 1,
+  },
 )
-hz.push({ kind: 'roller', model: 'onionRoll', s: trenchA + 125, d: 0, amp: 5, speed: 12, period: 3.9, phase: 2.2, r: 1.3, side: -1 })
+hz.push({
+  kind: 'roller',
+  model: 'onionRoll',
+  s: trenchA + 125,
+  d: 0,
+  amp: 5,
+  speed: 12,
+  period: 3.9,
+  phase: 2.2,
+  r: 1.3,
+  side: -1,
+})
 tk.push(...tokenWave(trenchA + 8, trenchA + 140, 3, 11))
 b.straight(20)
 checkpoints.push(Math.round(b.s))
@@ -42,14 +86,27 @@ const rampS = Math.round(b.s) + 22
 b.straight(40)
 seg.push({ type: 'ramp', s0: rampS, s1: rampS + 6, height: 1.8 })
 seg.push({ type: 'gap', s0: rampS + 6, s1: rampS + 18 })
-tk.push({ s: rampS + 10, d: 0, y: 3 }, { s: rampS + 14, d: 0, y: 3 }, ...tokenLine(rampS - 14, rampS - 2, 0, 4))
+tk.push(
+  { s: rampS + 10, d: 0, y: 3 },
+  { s: rampS + 14, d: 0, y: 3 },
+  ...tokenLine(rampS - 14, rampS - 2, 0, 4),
+)
 b.straight(30)
 b.turn(30, 90)
 checkpoints.push(Math.round(b.s))
 
 // 4. Plank bridge with a worm crossing
 b.straight(20)
-hz.push({ kind: 'toddler', model: 'worm', s: b.s + 5, d: 0, amp: 5.5, period: 5.4, phase: 0, r: 1.8 })
+hz.push({
+  kind: 'toddler',
+  model: 'worm',
+  s: b.s + 5,
+  d: 0,
+  amp: 5.5,
+  period: 5.4,
+  phase: 0,
+  r: 1.8,
+})
 b.straight(30)
 const plankA = b.s
 b.straight(75)
@@ -64,7 +121,10 @@ b.straight(16)
 const tunA = b.s
 b.straight(55)
 const tunB = b.s
-seg.push({ type: 'tunnel', s0: tunA, s1: tunB, height: 6.2 }, { type: 'surface', s0: tunA, s1: tunB, surface: 'water' })
+seg.push(
+  { type: 'tunnel', s0: tunA, s1: tunB, height: 6.2 },
+  { type: 'surface', s0: tunA, s1: tunB, surface: 'water' },
+)
 tk.push(...tokenWave(tunA + 6, tunB - 6, 3, 8))
 b.straight(20)
 checkpoints.push(Math.round(b.s))
@@ -79,7 +139,18 @@ b.straight(100)
 b.turn(45, 90)
 boosts.push({ s: Math.round(b.s) + 10, d: 0 })
 b.straight(80)
-hz.push({ kind: 'roller', model: 'onionRoll', s: b.s - 40, d: 0, amp: 7, speed: 13, period: 4, phase: 1, r: 1.3, side: -1 })
+hz.push({
+  kind: 'roller',
+  model: 'onionRoll',
+  s: b.s - 40,
+  d: 0,
+  amp: 7,
+  speed: 13,
+  period: 4,
+  phase: 1,
+  r: 1.3,
+  side: -1,
+})
 tk.push(...tokenWave(b.s - 60, b.s - 5, 4, 10))
 b.turn(-45, 90)
 b.straight(70)
@@ -99,7 +170,8 @@ props.push(
   { kind: 'twigArch', s: 130, d: 0 },
   { kind: 'twigArch', s: plankA - 12, d: 0 },
 )
-for (let s = 0; s < length; s += 22) props.push({ kind: 'picket', s, d: 52 }, { kind: 'picket', s: s + 11, d: -54 })
+for (let s = 0; s < length; s += 22)
+  props.push({ kind: 'picket', s, d: 52 }, { kind: 'picket', s: s + 11, d: -54 })
 
 export const gardenLevel: LevelConfig = {
   id: 'garden',

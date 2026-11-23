@@ -102,7 +102,14 @@ export function wallStrip(
 }
 
 /** Half-pipe tunnel/arch shell over [a,b] made of coloured rings (bricks). */
-function tunnelShell(track: Track, a: number, b: number, height: number, hwOf: (s: number) => number, colors: [number, number]): THREE.BufferGeometry {
+function tunnelShell(
+  track: Track,
+  a: number,
+  b: number,
+  height: number,
+  hwOf: (s: number) => number,
+  colors: [number, number],
+): THREE.BufferGeometry {
   const pos: number[] = []
   const col: number[] = []
   const c0 = new THREE.Color(colors[0])
@@ -115,7 +122,12 @@ function tunnelShell(track: Track, a: number, b: number, height: number, hwOf: (
   for (let i = 0; i < rings.length - 1; i++) {
     for (let k = 0; k < seg; k++) {
       const quad: [number, number, number, number][] = []
-      for (const [ri, ak] of [[i, k], [i, k + 1], [i + 1, k], [i + 1, k + 1]] as const) {
+      for (const [ri, ak] of [
+        [i, k],
+        [i, k + 1],
+        [i + 1, k],
+        [i + 1, k + 1],
+      ] as const) {
         const s = rings[ri]
         const p = track.at(s, P)
         const ang = (ak / seg) * Math.PI
@@ -146,7 +158,8 @@ export interface TrackMeshes {
 
 function splitRuns(level: LevelConfig, length: number): [number, number][] {
   const cuts: [number, number][] = []
-  for (const g of level.segments) if (g.type === 'gap' || g.type === 'plank') cuts.push([g.s0, g.s1])
+  for (const g of level.segments)
+    if (g.type === 'gap' || g.type === 'plank') cuts.push([g.s0, g.s1])
   cuts.sort((x, y) => x[0] - y[0])
   const runs: [number, number][] = []
   let cur = 0
@@ -174,16 +187,39 @@ export function buildTrackMeshes(
   const group = new THREE.Group()
   const th = level.theme
   const bounds = level.segments.flatMap((g: SegmentDef) => [g.s0, g.s1])
-  const floorMat = new THREE.MeshStandardMaterial({ map: floorMap, roughness: 1, side: THREE.DoubleSide })
-  const trackMat = new THREE.MeshStandardMaterial({ map: trackMap, roughness: 0.85, side: THREE.DoubleSide })
+  const floorMat = new THREE.MeshStandardMaterial({
+    map: floorMap,
+    roughness: 1,
+    side: THREE.DoubleSide,
+  })
+  const trackMat = new THREE.MeshStandardMaterial({
+    map: trackMap,
+    roughness: 0.85,
+    side: THREE.DoubleSide,
+  })
   const yOf = (s: number) => track.ground(s, 0) ?? 0
   let tris = 0
 
   for (const [a, b] of splitRuns(level, track.length)) {
-    const shoulder = new THREE.Mesh(ribbon(track, a, b, -90, 90, () => -0.08, 8, []), floorMat)
+    const shoulder = new THREE.Mesh(
+      ribbon(track, a, b, -90, 90, () => -0.08, 8, []),
+      floorMat,
+    )
     shoulder.receiveShadow = true
     group.add(shoulder)
-    const road = new THREE.Mesh(ribbon(track, a, b, (s) => -track.halfWidth(s), (s) => track.halfWidth(s), yOf, 8, bounds), trackMat)
+    const road = new THREE.Mesh(
+      ribbon(
+        track,
+        a,
+        b,
+        (s) => -track.halfWidth(s),
+        (s) => track.halfWidth(s),
+        yOf,
+        8,
+        bounds,
+      ),
+      trackMat,
+    )
     road.receiveShadow = true
     group.add(road)
     tris += ((b - a) * 2 * 2) | 0
@@ -193,7 +229,17 @@ export function buildTrackMeshes(
       const trench = level.segments.find((g) => g.type === 'trench' && g.s0 < b && g.s1 > a)
       const wallH = trench && trench.type === 'trench' ? (trench.wallHeight ?? 1.5) : 0.35
       batch.addRaw(
-        wallStrip(track, a, b, side, wallH, trench ? 1.4 : 0.5, (s) => track.halfWidth(s), yOf, bounds),
+        wallStrip(
+          track,
+          a,
+          b,
+          side,
+          wallH,
+          trench ? 1.4 : 0.5,
+          (s) => track.halfWidth(s),
+          yOf,
+          bounds,
+        ),
         th.curbColor,
         chunk,
       )
@@ -202,7 +248,10 @@ export function buildTrackMeshes(
 
   // abyss + cliffs
   const abyssColor = new THREE.Color(th.fog).lerp(new THREE.Color(0x000000), 0.55)
-  const abyss = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000), new THREE.MeshBasicMaterial({ color: abyssColor }))
+  const abyss = new THREE.Mesh(
+    new THREE.PlaneGeometry(4000, 4000),
+    new THREE.MeshBasicMaterial({ color: abyssColor }),
+  )
   abyss.rotation.x = -Math.PI / 2
   abyss.position.y = -14
   group.add(abyss)
@@ -213,7 +262,11 @@ export function buildTrackMeshes(
       const geo = new THREE.PlaneGeometry(180, 14)
       geo.rotateY(Math.atan2(p.tx, -p.tz) + Math.PI)
       geo.translate(p.x, -7.08, p.z)
-      batch.addRaw(geo, new THREE.Color(th.curbColor).multiplyScalar(0.5).getHex(), Math.floor(s / CHUNK))
+      batch.addRaw(
+        geo,
+        new THREE.Color(th.curbColor).multiplyScalar(0.5).getHex(),
+        Math.floor(s / CHUNK),
+      )
     }
   }
 
@@ -250,30 +303,74 @@ export function buildTrackMeshes(
   // tunnels
   for (const g of level.segments) {
     if (g.type !== 'tunnel') continue
-    batch.addRaw(tunnelShell(track, g.s0, g.s1, g.height, (s) => track.halfWidth(s), [0x8a4b3a, 0x74402f]), -1, Math.floor(g.s0 / CHUNK))
+    batch.addRaw(
+      tunnelShell(track, g.s0, g.s1, g.height, (s) => track.halfWidth(s), [0x8a4b3a, 0x74402f]),
+      -1,
+      Math.floor(g.s0 / CHUNK),
+    )
     // end rings
     for (const s of [g.s0, g.s1]) {
       ctx.place(s, 0, 0)
       const hw = track.halfWidth(s) + 0.6
       for (let k = 0; k <= 10; k++) {
         const ang = (k / 10) * Math.PI
-        ctx.box(0xb9a58a, 0.9, 0.9, 0.9, -Math.cos(ang) * (hw + 0.3), Math.sin(ang) * (g.height + 0.3), 0)
+        ctx.box(
+          0xb9a58a,
+          0.9,
+          0.9,
+          0.9,
+          -Math.cos(ang) * (hw + 0.3),
+          Math.sin(ang) * (g.height + 0.3),
+          0,
+        )
       }
     }
   }
 
   // water
-  const waterMat = new THREE.MeshStandardMaterial({ color: 0x2f7fbf, transparent: true, opacity: 0.6, roughness: 0.1, metalness: 0.2, emissive: 0x0a2a44 })
+  const waterMat = new THREE.MeshStandardMaterial({
+    color: 0x2f7fbf,
+    transparent: true,
+    opacity: 0.6,
+    roughness: 0.1,
+    metalness: 0.2,
+    emissive: 0x0a2a44,
+  })
   for (const g of level.segments) {
     if (g.type !== 'surface' || g.surface === 'normal') continue
-    const m = g.surface === 'water' ? waterMat : new THREE.MeshStandardMaterial({ color: 0xf2efe2, roughness: 0.2, transparent: true, opacity: 0.85 })
-    const mesh = new THREE.Mesh(ribbon(track, g.s0, g.s1, (s) => -track.halfWidth(s) + 0.2, (s) => track.halfWidth(s) - 0.2, () => 0.04, 8, bounds), m)
+    const m =
+      g.surface === 'water'
+        ? waterMat
+        : new THREE.MeshStandardMaterial({
+            color: 0xf2efe2,
+            roughness: 0.2,
+            transparent: true,
+            opacity: 0.85,
+          })
+    const mesh = new THREE.Mesh(
+      ribbon(
+        track,
+        g.s0,
+        g.s1,
+        (s) => -track.halfWidth(s) + 0.2,
+        (s) => track.halfWidth(s) - 0.2,
+        () => 0.04,
+        8,
+        bounds,
+      ),
+      m,
+    )
     mesh.receiveShadow = true
     group.add(mesh)
   }
 
   // boost pads
-  const padMat = new THREE.MeshStandardMaterial({ map: chevron, emissive: 0xffc800, emissiveIntensity: 0.35, roughness: 0.6 })
+  const padMat = new THREE.MeshStandardMaterial({
+    map: chevron,
+    emissive: 0xffc800,
+    emissiveIntensity: 0.35,
+    roughness: 0.6,
+  })
   for (const b of level.boosts) {
     const p = track.at(b.s, P)
     const geo = new THREE.PlaneGeometry(5.6, 4.6)
@@ -297,8 +394,24 @@ export function addCheckpointFlags(level: LevelConfig, track: Track, ctx: PropCt
       ctx.sphere(0xffd21a, 0.14, 0, 3.65, 0)
       // red-and-white pennant (stacked wedges)
       for (let i = 0; i < 5; i++) {
-        ctx.box(i % 2 ? 0xffffff : 0xe5252a, 0.6, 0.38, 0.05, side * -(0.3 + i * 0), 3.3 - i * 0.04, 0)
-        ctx.box(i % 2 ? 0xffffff : 0xe5252a, 0.4 - i * 0.07, 0.38, 0.05, side * -(0.9 + i * 0.3), 3.3, 0)
+        ctx.box(
+          i % 2 ? 0xffffff : 0xe5252a,
+          0.6,
+          0.38,
+          0.05,
+          side * -(0.3 + i * 0),
+          3.3 - i * 0.04,
+          0,
+        )
+        ctx.box(
+          i % 2 ? 0xffffff : 0xe5252a,
+          0.4 - i * 0.07,
+          0.38,
+          0.05,
+          side * -(0.9 + i * 0.3),
+          3.3,
+          0,
+        )
       }
     }
     ctx.place(s, 0, 0)
@@ -306,7 +419,13 @@ export function addCheckpointFlags(level: LevelConfig, track: Track, ctx: PropCt
   }
 }
 
-export function addFinishGate(level: LevelConfig, track: Track, ctx: PropCtx, checker: THREE.Texture, group: THREE.Group): void {
+export function addFinishGate(
+  level: LevelConfig,
+  track: Track,
+  ctx: PropCtx,
+  checker: THREE.Texture,
+  group: THREE.Group,
+): void {
   const s = track.length - 2
   const hw = track.halfWidth(s)
   const p = track.at(s, P)
@@ -327,7 +446,16 @@ export function addFinishGate(level: LevelConfig, track: Track, ctx: PropCtx, ch
   // start + finish line stripes
   for (const ss of [2, s + 0.5]) {
     ctx.place(ss, 0, 0)
-    for (let i = 0; i < 8; i++) ctx.box(i % 2 ? 0x111111 : 0xffffff, (hw * 2) / 8, 0.05, 1, -hw + (i + 0.5) * ((hw * 2) / 8), 0.03, 0)
+    for (let i = 0; i < 8; i++)
+      ctx.box(
+        i % 2 ? 0x111111 : 0xffffff,
+        (hw * 2) / 8,
+        0.05,
+        1,
+        -hw + (i + 0.5) * ((hw * 2) / 8),
+        0.03,
+        0,
+      )
   }
   void level
   void GEO

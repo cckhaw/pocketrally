@@ -55,10 +55,18 @@ export class PostFX {
   enabled = true
   reducedMotion = false
 
-  constructor(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera, q: QualityPreset) {
+  constructor(
+    renderer: THREE.WebGLRenderer,
+    scene: THREE.Scene,
+    camera: THREE.Camera,
+    q: QualityPreset,
+  ) {
     this.samples = q.msaa
     const size = renderer.getSize(new THREE.Vector2())
-    const target = new THREE.WebGLRenderTarget(size.x, size.y, { type: THREE.HalfFloatType, samples: q.msaa })
+    const target = new THREE.WebGLRenderTarget(size.x, size.y, {
+      type: THREE.HalfFloatType,
+      samples: q.msaa,
+    })
     this.composer = new EffectComposer(renderer, target)
     this.composer.addPass(new RenderPass(scene, camera))
     this.bloom = new UnrealBloomPass(new THREE.Vector2(size.x, size.y), 0.25, 0.6, 0.88)

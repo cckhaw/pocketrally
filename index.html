@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#1b1410" />
+    <meta
+      name="description"
+      content="Pocket Rally: a tiny toy RC car racing through giant everyday places."
+    />
+    <title>Pocket Rally</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/src/ui/style.css" />
+  </head>
+  <body data-screen="boot">
+    <div id="game">
+      <canvas id="canvas"></canvas>
+    </div>
+    <div id="ui"></div>
+    <noscript>Pocket Rally needs JavaScript and WebGL.</noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

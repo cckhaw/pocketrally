@@ -30,7 +30,11 @@ function shade(n: number, f: number): string {
 }
 
 /** Repeating floor texture: noisy dirt, wood planks or stone flags. One tile = 8 world units. */
-export function floorTexture(kind: 'dirt' | 'wood' | 'stone', base: number, seed = 1): THREE.CanvasTexture {
+export function floorTexture(
+  kind: 'dirt' | 'wood' | 'stone',
+  base: number,
+  seed = 1,
+): THREE.CanvasTexture {
   const S = 256
   const [c, g] = canvas(S, S)
   const r = rng(seed)

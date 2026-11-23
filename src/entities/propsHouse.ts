@@ -31,7 +31,16 @@ export function houseProp(c: PropCtx, kind: string, v: number, _level: LevelConf
       return true
     case 'cable':
       for (let i = 0; i < 12; i++) {
-        c.box(0x16161a, 0.5, 0.45, 1.6, Math.sin(i * 0.7) * 2.4, 0.22, i * 1.3 - 8, Math.cos(i * 0.7) * 0.5)
+        c.box(
+          0x16161a,
+          0.5,
+          0.45,
+          1.6,
+          Math.sin(i * 0.7) * 2.4,
+          0.22,
+          i * 1.3 - 8,
+          Math.cos(i * 0.7) * 0.5,
+        )
       }
       c.box(0xdddddd, 1, 0.8, 1.4, 0, 0.4, 8.5)
       return true
@@ -70,7 +79,15 @@ export function houseProp(c: PropCtx, kind: string, v: number, _level: LevelConf
       for (let i = 0; i < 22; i++) {
         const a = i * 2.39
         const r = 0.5 + (i % 7) * 0.45
-        c.add(CEREAL, [0xf2c14e, 0xe89a2a, 0xf7d98a][i % 3], { x: Math.cos(a) * r * 1.6, y: 0.2, z: Math.sin(a) * r * 1.6, sx: 0.75, sy: 0.75, sz: 0.75, rx: Math.PI / 2 })
+        c.add(CEREAL, [0xf2c14e, 0xe89a2a, 0xf7d98a][i % 3], {
+          x: Math.cos(a) * r * 1.6,
+          y: 0.2,
+          z: Math.sin(a) * r * 1.6,
+          sx: 0.75,
+          sy: 0.75,
+          sz: 0.75,
+          rx: Math.PI / 2,
+        })
       }
       c.cyl(0xf4f1e6, 4.2, 0.06, 0, 0.05, 0)
       c.cyl(0xffffff, 2.6, 0.08, 0.8, 0.07, 0.4)
@@ -88,7 +105,8 @@ export function houseProp(c: PropCtx, kind: string, v: number, _level: LevelConf
     case 'shelf':
       c.box(0x7a5230, 12, 26, 4, 0, 13, 0)
       for (let r = 0; r < 5; r++) {
-        for (let k = 0; k < 8; k++) c.box(BOOKS[(r + k) % 6], 1.0, 3.6, 3, -5 + k * 1.3, 3 + r * 5, 0.8)
+        for (let k = 0; k < 8; k++)
+          c.box(BOOKS[(r + k) % 6], 1.0, 3.6, 3, -5 + k * 1.3, 3 + r * 5, 0.8)
       }
       c.blocker(0, 13, 0, 12, 26, 4)
       return true

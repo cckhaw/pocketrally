@@ -9,7 +9,12 @@ export default defineConfig({
   },
   preview: { proxy: { '/api': { target: 'http://127.0.0.1:3101' } } },
   test: {
-    include: ['src/**/*.test.ts', 'api/**/*.test.ts', 'scripts/**/*.test.{ts,mjs}', 'tests/unit/**/*.test.ts'],
+    include: [
+      'src/**/*.test.ts',
+      'api/**/*.test.ts',
+      'scripts/**/*.test.{ts,mjs}',
+      'tests/unit/**/*.test.ts',
+    ],
     environment: 'node',
   },
 })

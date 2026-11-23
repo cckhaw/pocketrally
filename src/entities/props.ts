@@ -8,6 +8,9 @@ import { cellarProp } from './propsCellar'
 export function buildProp(ctx: PropCtx, def: PropDef, level: LevelConfig): void {
   ctx.place(def.s, def.d, def.rot ?? 0, def.scale ?? 1)
   const v = def.v ?? 0
-  const ok = gardenProp(ctx, def.kind, v) || houseProp(ctx, def.kind, v, level) || cellarProp(ctx, def.kind, v)
+  const ok =
+    gardenProp(ctx, def.kind, v) ||
+    houseProp(ctx, def.kind, v, level) ||
+    cellarProp(ctx, def.kind, v)
   if (!ok) throw new Error(`Unknown prop kind: ${def.kind}`)
 }

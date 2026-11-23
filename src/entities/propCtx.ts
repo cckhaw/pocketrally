@@ -38,8 +38,15 @@ export class PropCtx {
     this.heading = Math.atan2(p.tx, -p.tz)
     this.chunk = Math.floor(s / CHUNK)
     this.scale = scale
-    const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -this.heading + rot)
-    this.base.compose(new THREE.Vector3(this.x, this.y, this.z), q, new THREE.Vector3(scale, scale, scale))
+    const q = new THREE.Quaternion().setFromAxisAngle(
+      new THREE.Vector3(0, 1, 0),
+      -this.heading + rot,
+    )
+    this.base.compose(
+      new THREE.Vector3(this.x, this.y, this.z),
+      q,
+      new THREE.Vector3(scale, scale, scale),
+    )
   }
 
   /** Add a primitive in the local frame. */
@@ -48,7 +55,18 @@ export class PropCtx {
     this.batch.addMatrix(geo, color, this.tmp, this.chunk)
   }
 
-  box(color: number, w: number, h: number, d: number, x = 0, y = 0, z = 0, ry = 0, rx = 0, rz = 0): void {
+  box(
+    color: number,
+    w: number,
+    h: number,
+    d: number,
+    x = 0,
+    y = 0,
+    z = 0,
+    ry = 0,
+    rx = 0,
+    rz = 0,
+  ): void {
     this.add(GEO.box, color, { x, y, z, sx: w, sy: h, sz: d, ry, rx, rz })
   }
 

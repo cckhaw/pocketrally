@@ -12,7 +12,16 @@ export function gardenProp(c: PropCtx, kind: string, v: number): boolean {
       c.sphere(0xe9d7a0, 0.9, 0, 0.3, 0, 1.6, 0.4, 1.6)
       for (let i = 0; i < 4; i++) {
         const a = (i / 4) * Math.PI * 2 + v
-        c.cyl(GREENS[i % 3], 0.35, 11, Math.cos(a) * 0.9, 10, Math.sin(a) * 0.9, Math.sin(a) * 0.25, -Math.cos(a) * 0.25)
+        c.cyl(
+          GREENS[i % 3],
+          0.35,
+          11,
+          Math.cos(a) * 0.9,
+          10,
+          Math.sin(a) * 0.9,
+          Math.sin(a) * 0.25,
+          -Math.cos(a) * 0.25,
+        )
       }
       c.blocker(0, 3, 0, 6, 6, 6)
       return true

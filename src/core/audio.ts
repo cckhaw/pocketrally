@@ -17,7 +17,8 @@ export class Audio {
       return
     }
     const Ctor: typeof AudioContext | undefined =
-      window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
     if (!Ctor) return
     try {
       this.ctx = new Ctor()
@@ -71,7 +72,15 @@ export class Audio {
   }
 
   setEngine(speed: number, boost: boolean, airborne: boolean): void {
-    if (!this.ctx || !this.engineOn || !this.engineOsc || !this.engineOsc2 || !this.engineGain || !this.engineFilter) return
+    if (
+      !this.ctx ||
+      !this.engineOn ||
+      !this.engineOsc ||
+      !this.engineOsc2 ||
+      !this.engineGain ||
+      !this.engineFilter
+    )
+      return
     const t = this.ctx.currentTime
     const f = 60 + speed * 3.4 + (boost ? 40 : 0) + (airborne ? 30 : 0)
     this.engineOsc.frequency.setTargetAtTime(f, t, 0.05)
@@ -81,10 +90,18 @@ export class Audio {
   }
 
   silenceEngine(): void {
-    if (this.ctx && this.engineGain) this.engineGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.05)
+    if (this.ctx && this.engineGain)
+      this.engineGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.05)
   }
 
-  private tone(freq: number, dur: number, type: OscillatorType, gain: number, slide = 0, delay = 0): void {
+  private tone(
+    freq: number,
+    dur: number,
+    type: OscillatorType,
+    gain: number,
+    slide = 0,
+    delay = 0,
+  ): void {
     if (!this.ctx || !this.master) return
     const c = this.ctx
     const t = c.currentTime + delay
@@ -102,7 +119,14 @@ export class Audio {
     o.stop(t + dur + 0.05)
   }
 
-  private burst(dur: number, gain: number, freq: number, q = 1, type: BiquadFilterType = 'lowpass', sweep = 0): void {
+  private burst(
+    dur: number,
+    gain: number,
+    freq: number,
+    q = 1,
+    type: BiquadFilterType = 'lowpass',
+    sweep = 0,
+  ): void {
     if (!this.ctx || !this.master || !this.noise) return
     const c = this.ctx
     const t = c.currentTime

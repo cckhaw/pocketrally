@@ -22,8 +22,14 @@ export class Trail {
     this.col = new Float32Array(points * 2 * 4)
     this.ages = new Float32Array(points)
     this.geo = new THREE.BufferGeometry()
-    this.geo.setAttribute('position', new THREE.BufferAttribute(this.pos, 3).setUsage(THREE.DynamicDrawUsage))
-    this.geo.setAttribute('color', new THREE.BufferAttribute(this.col, 4).setUsage(THREE.DynamicDrawUsage))
+    this.geo.setAttribute(
+      'position',
+      new THREE.BufferAttribute(this.pos, 3).setUsage(THREE.DynamicDrawUsage),
+    )
+    this.geo.setAttribute(
+      'color',
+      new THREE.BufferAttribute(this.col, 4).setUsage(THREE.DynamicDrawUsage),
+    )
     const idx: number[] = []
     for (let i = 0; i < points - 1; i++) {
       const a = i * 2
@@ -32,7 +38,14 @@ export class Trail {
     this.geo.setIndex(idx)
     this.mesh = new THREE.Mesh(
       this.geo,
-      new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -3 }),
+      new THREE.MeshBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        polygonOffset: true,
+        polygonOffsetFactor: -3,
+      }),
     )
     this.mesh.frustumCulled = false
     this.mesh.renderOrder = 1

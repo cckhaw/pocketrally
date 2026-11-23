@@ -72,7 +72,10 @@ export class Batch {
     g.setAttribute('color', new THREE.BufferAttribute(arr, 3))
   }
 
-  private push(g: THREE.BufferGeometry, chunk: number): void {
+  private push(g0: THREE.BufferGeometry, chunk: number): void {
+    const g = g0.index ? g0.toNonIndexed() : g0
+    if (g !== g0) g0.dispose()
+    if (!g.getAttribute('normal')) g.computeVertexNormals()
     for (const name of Object.keys(g.attributes)) {
       if (name !== 'position' && name !== 'normal' && name !== 'color') g.deleteAttribute(name)
     }

@@ -29,7 +29,8 @@ export interface TokenDef {
   y?: number
 }
 
-export type HazardKind = 'stomp' | 'paw' | 'toddler' | 'roller' | 'vacuum' | 'door' | 'fan' | 'block'
+export type HazardKind =
+  'stomp' | 'paw' | 'toddler' | 'roller' | 'vacuum' | 'door' | 'fan' | 'block'
 
 export interface HazardDef {
   kind: HazardKind

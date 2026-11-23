@@ -50,9 +50,18 @@ export class Particles {
     this.baseSize = new Float32Array(max)
     this.grav = new Float32Array(max)
     this.geo = new THREE.BufferGeometry()
-    this.geo.setAttribute('position', new THREE.BufferAttribute(this.pos, 3).setUsage(THREE.DynamicDrawUsage))
-    this.geo.setAttribute('aColor', new THREE.BufferAttribute(this.col, 4).setUsage(THREE.DynamicDrawUsage))
-    this.geo.setAttribute('aSize', new THREE.BufferAttribute(this.size, 1).setUsage(THREE.DynamicDrawUsage))
+    this.geo.setAttribute(
+      'position',
+      new THREE.BufferAttribute(this.pos, 3).setUsage(THREE.DynamicDrawUsage),
+    )
+    this.geo.setAttribute(
+      'aColor',
+      new THREE.BufferAttribute(this.col, 4).setUsage(THREE.DynamicDrawUsage),
+    )
+    this.geo.setAttribute(
+      'aSize',
+      new THREE.BufferAttribute(this.size, 1).setUsage(THREE.DynamicDrawUsage),
+    )
     const mat = new THREE.ShaderMaterial({
       vertexShader: VERT,
       fragmentShader: FRAG,

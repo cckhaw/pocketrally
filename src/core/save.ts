@@ -76,7 +76,8 @@ export function load(): SaveData {
       const p = JSON.parse(raw) as Partial<SaveData>
       const base = fresh()
       data = {
-        playerId: typeof p.playerId === 'string' && p.playerId.length >= 8 ? p.playerId : base.playerId,
+        playerId:
+          typeof p.playerId === 'string' && p.playerId.length >= 8 ? p.playerId : base.playerId,
         settings: { ...base.settings, ...(p.settings ?? {}) },
         bests: p.bests && typeof p.bests === 'object' ? p.bests : {},
         queue: Array.isArray(p.queue) ? p.queue : [],
@@ -100,7 +101,12 @@ export function persist(): void {
 }
 
 /** Records a finished run; returns true if it is a new personal best. */
-export function recordBest(levelId: string, timeMs: number, tokens: number, stars: number): boolean {
+export function recordBest(
+  levelId: string,
+  timeMs: number,
+  tokens: number,
+  stars: number,
+): boolean {
   const save = load()
   const prev = save.bests[levelId]
   const better = !prev || timeMs < prev.timeMs

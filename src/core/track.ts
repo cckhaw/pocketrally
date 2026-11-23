@@ -185,5 +185,7 @@ function sampleSpline(wp: Waypoint[]): Waypoint[] {
 function cr(a: number, b: number, c: number, d: number, t: number): number {
   const t2 = t * t
   const t3 = t2 * t
-  return 0.5 * (2 * b + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t2 + (-a + 3 * b - 3 * c + d) * t3)
+  return (
+    0.5 * (2 * b + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t2 + (-a + 3 * b - 3 * c + d) * t3)
+  )
 }

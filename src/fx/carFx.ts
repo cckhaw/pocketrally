@@ -35,8 +35,8 @@ export class CarFx {
     const slide = Math.abs(car.vLat) > 6 || car.brake || car.spinT > 0
     this.left.active = grounded && (slide || car.boostT > 0) && car.speed > 4
     this.right.active = this.left.active
-    const back = 0.85
-    const wl = 0.78
+    const back = 0.63
+    const wl = 0.58
     this.left.push(dt, pos.x - hx * back - rx * wl, pos.y, pos.z - hz * back - rz * wl, rx, rz)
     this.right.push(dt, pos.x - hx * back + rx * wl, pos.y, pos.z - hz * back + rz * wl, rx, rz)
 
@@ -86,7 +86,18 @@ export class CarFx {
     }
   }
 
-  burst(x: number, y: number, z: number, n: number, r: number, g: number, b: number, speed = 4, size = 0.6, gravity = 12): void {
+  burst(
+    x: number,
+    y: number,
+    z: number,
+    n: number,
+    r: number,
+    g: number,
+    b: number,
+    speed = 4,
+    size = 0.6,
+    gravity = 12,
+  ): void {
     for (let i = 0; i < n; i++) {
       const a = Math.random() * Math.PI * 2
       const u = Math.random()
@@ -111,6 +122,17 @@ export class CarFx {
   landing(pos: THREE.Vector3, impact: number): void {
     const n = Math.min(30, 6 + Math.round(impact))
     this.burst(pos.x, pos.y + 0.1, pos.z, n, 1, 0.8, 0.3, 4 + impact * 0.2, 0.5, 14)
-    this.burst(pos.x, pos.y + 0.1, pos.z, Math.round(n / 2), this.dustColor.r, this.dustColor.g, this.dustColor.b, 3, 1.1, -0.5)
+    this.burst(
+      pos.x,
+      pos.y + 0.1,
+      pos.z,
+      Math.round(n / 2),
+      this.dustColor.r,
+      this.dustColor.g,
+      this.dustColor.b,
+      3,
+      1.1,
+      -0.5,
+    )
   }
 }

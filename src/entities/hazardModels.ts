@@ -13,7 +13,18 @@ export class Mini {
     this.batch.add(geo, color, t, 0)
     return this
   }
-  box(color: number, w: number, h: number, d: number, x = 0, y = 0, z = 0, ry = 0, rx = 0, rz = 0): this {
+  box(
+    color: number,
+    w: number,
+    h: number,
+    d: number,
+    x = 0,
+    y = 0,
+    z = 0,
+    ry = 0,
+    rx = 0,
+    rz = 0,
+  ): this {
     return this.add(GEO.box, color, { x, y, z, sx: w, sy: h, sz: d, ry, rx, rz })
   }
   cyl(color: number, r: number, h: number, x = 0, y = 0, z = 0, rx = 0, rz = 0, ry = 0): this {
@@ -32,7 +43,11 @@ export class Mini {
   }
 }
 
-const MODEL_MAT = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.65, metalness: 0.05 })
+const MODEL_MAT = new THREE.MeshStandardMaterial({
+  vertexColors: true,
+  roughness: 0.65,
+  metalness: 0.05,
+})
 
 const SKIN = 0xf0b48c
 const SKIN_D = 0xd89c74
@@ -171,7 +186,13 @@ function wormModel(): THREE.Mesh {
   const n = 9
   for (let i = 0; i < n; i++) {
     const t = i / (n - 1)
-    m.sphere(i % 2 ? 0xe0a0a0 : 0xd98a8a, 1.15 - 0.3 * Math.abs(t - 0.5), 0, 0.95 + Math.sin(t * Math.PI * 2) * 0.55, (t - 0.5) * 7)
+    m.sphere(
+      i % 2 ? 0xe0a0a0 : 0xd98a8a,
+      1.15 - 0.3 * Math.abs(t - 0.5),
+      0,
+      0.95 + Math.sin(t * Math.PI * 2) * 0.55,
+      (t - 0.5) * 7,
+    )
   }
   m.sphere(0xcf7a7a, 1.1, 0, 1.2, -3.8)
   m.sphere(0x222222, 0.16, -0.4, 1.7, -4.7)
@@ -211,7 +232,13 @@ function catModel(): THREE.Mesh {
   m.sphere(fur, 0.8, 0, 2.0, -1.9)
   m.cone(fur, 0.3, 0.6, -0.4, 2.8, -1.9)
   m.cone(fur, 0.3, 0.6, 0.4, 2.8, -1.9)
-  for (const [x, z] of [[-0.5, -1], [0.5, -1], [-0.5, 1], [0.5, 1]]) m.cyl(fur, 0.22, 1.5, x, 0.75, z)
+  for (const [x, z] of [
+    [-0.5, -1],
+    [0.5, -1],
+    [-0.5, 1],
+    [0.5, 1],
+  ])
+    m.cyl(fur, 0.22, 1.5, x, 0.75, z)
   m.cyl(0xc9701f, 0.18, 3, 0, 2.6, 2.4, 0.6, 0)
   m.box(0x8a4a1a, 0.9, 0.12, 2.4, 0, 2.3, 0)
   return m.mesh()

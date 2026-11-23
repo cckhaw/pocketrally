@@ -119,7 +119,8 @@ export function stepCar(
   const tgt = targetSpeed(car, input.brake, surfSlow)
   const rate = car.speed > tgt ? CAR.brakeDecel : car.boostT > 0 ? CAR.boostAccel : CAR.accel
   const airFactor = car.grounded ? 1 : 0.2
-  car.speed += Math.sign(tgt - car.speed) * Math.min(Math.abs(tgt - car.speed), rate * airFactor * dt)
+  car.speed +=
+    Math.sign(tgt - car.speed) * Math.min(Math.abs(tgt - car.speed), rate * airFactor * dt)
 
   // Lateral steering (spinning out removes control)
   const steer = car.spinT > 0 ? 0 : Math.max(-1, Math.min(1, input.steer)) * sensitivity

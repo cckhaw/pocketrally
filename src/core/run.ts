@@ -1,4 +1,12 @@
-import { CAR, hit, makeCar, respawn, stepCar, type CarInput, type CarState } from '../car/controller'
+import {
+  CAR,
+  hit,
+  makeCar,
+  respawn,
+  stepCar,
+  type CarInput,
+  type CarState,
+} from '../car/controller'
 import { evalHazard, hazardHits, makeHazardState, type HazardState } from '../entities/hazards'
 import { SIM_DT, type LevelConfig } from '../levels/types'
 import { Track } from './track'
@@ -113,7 +121,11 @@ export class Run {
     for (let i = 0; i < toks.length; i++) {
       if (this.tokens[i]) continue
       const t = toks[i]
-      if (Math.abs(t.s - car.s) < 1.4 && Math.abs(t.d - car.d) < 1.5 && Math.abs((t.y ?? 0) + 0.6 - car.y) < 2.2) {
+      if (
+        Math.abs(t.s - car.s) < 1.4 &&
+        Math.abs(t.d - car.d) < 1.5 &&
+        Math.abs((t.y ?? 0) + 0.6 - car.y) < 2.2
+      ) {
         this.tokens[i] = 1
         this.tokenCount++
         this.push('token', i)

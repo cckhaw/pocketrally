@@ -98,7 +98,10 @@ export class Input {
   }
 
   private dragRange(type: string): number {
-    const base = type === 'mouse' ? window.innerWidth * 0.1 : Math.min(window.innerWidth, window.innerHeight) * 0.16
+    const base =
+      type === 'mouse'
+        ? window.innerWidth * 0.1
+        : Math.min(window.innerWidth, window.innerHeight) * 0.16
     return Math.max(40, base / Math.max(0.3, this.settings().sensitivity))
   }
 
@@ -143,7 +146,8 @@ export class Input {
       const r = this.keys.has('ArrowRight') || this.keys.has('KeyD')
       const k = (r ? 1 : 0) - (l ? 1 : 0)
       if (k !== 0) target = k
-      if (this.keys.has('Space') || this.keys.has('ArrowDown') || this.keys.has('KeyS')) brake = true
+      if (this.keys.has('Space') || this.keys.has('ArrowDown') || this.keys.has('KeyS'))
+        brake = true
     }
 
     if (this.allowed('touch') || this.allowed('mouse')) {
@@ -181,7 +185,8 @@ export class Input {
           target = v
           this.setDevice('gamepad')
         }
-        if (pad.buttons[0]?.pressed || pad.buttons[6]?.pressed || pad.buttons[7]?.pressed) brake = true
+        if (pad.buttons[0]?.pressed || pad.buttons[6]?.pressed || pad.buttons[7]?.pressed)
+          brake = true
         const start = !!pad.buttons[9]?.pressed
         if (start && !this.lastPad) this.onPause()
         this.lastPad = start

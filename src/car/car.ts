@@ -2,6 +2,8 @@ import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import type { CarState } from './controller'
 
+export const CAR_SCALE = 0.74
+
 const mat = (color: number, rough = 0.45, metal = 0) =>
   new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal })
 
@@ -56,22 +58,47 @@ export class CarModel {
     this.body.add(mesh(new RoundedBoxGeometry(1.5, 0.16, 0.2, 2, 0.07), chrome, 0, 0.5, 1.2))
     // headlights
     for (const sx of [-0.45, 0.45]) {
-      const l = mesh(new THREE.SphereGeometry(0.15, 8, 6), new THREE.MeshStandardMaterial({ color: 0xfff2b0, emissive: 0xffe9a0, emissiveIntensity: 1.2 }), sx, 0.68, -1.15)
+      const l = mesh(
+        new THREE.SphereGeometry(0.15, 8, 6),
+        new THREE.MeshStandardMaterial({
+          color: 0xfff2b0,
+          emissive: 0xffe9a0,
+          emissiveIntensity: 1.2,
+        }),
+        sx,
+        0.68,
+        -1.15,
+      )
       this.body.add(l)
     }
     // spoiler
     this.body.add(mesh(new THREE.BoxGeometry(1.3, 0.08, 0.32), red, 0, 1.12, 1.0))
-    for (const sx of [-0.5, 0.5]) this.body.add(mesh(new THREE.BoxGeometry(0.08, 0.3, 0.1), dark, sx, 0.95, 1.0))
+    for (const sx of [-0.5, 0.5])
+      this.body.add(mesh(new THREE.BoxGeometry(0.08, 0.3, 0.1), dark, sx, 0.95, 1.0))
     // cockpit and critter
     this.body.add(mesh(new THREE.CylinderGeometry(0.34, 0.4, 0.2, 10), dark, 0, 1.12, 0.35))
     this.critterHead.position.set(0, 1.45, 0.35)
     this.critterHead.add(mesh(new THREE.SphereGeometry(0.3, 12, 10), green))
     for (const sx of [-0.13, 0.13]) {
-      this.critterHead.add(mesh(new THREE.SphereGeometry(0.1, 8, 6), new THREE.MeshStandardMaterial({ color: 0xffffff }), sx, 0.07, -0.22))
+      this.critterHead.add(
+        mesh(
+          new THREE.SphereGeometry(0.1, 8, 6),
+          new THREE.MeshStandardMaterial({ color: 0xffffff }),
+          sx,
+          0.07,
+          -0.22,
+        ),
+      )
       this.critterHead.add(mesh(new THREE.SphereGeometry(0.045, 6, 5), dark, sx, 0.07, -0.31))
       this.critterHead.add(mesh(new THREE.ConeGeometry(0.1, 0.22, 6), green, sx * 2.1, 0.3, 0.02))
     }
-    const helmet = mesh(new THREE.SphereGeometry(0.33, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), red, 0, 0.04, 0)
+    const helmet = mesh(
+      new THREE.SphereGeometry(0.33, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+      red,
+      0,
+      0.04,
+      0,
+    )
     this.critterHead.add(helmet)
     this.body.add(this.critterHead)
     // antenna with red tip
@@ -82,6 +109,7 @@ export class CarModel {
     this.body.add(this.antenna)
 
     this.root.add(this.body)
+    this.root.scale.setScalar(CAR_SCALE)
 
     // wheels
     const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.38, 14)
@@ -121,8 +149,14 @@ export class CarModel {
     }
     const tex = new THREE.CanvasTexture(c)
     this.shadow = new THREE.Mesh(
-      new THREE.PlaneGeometry(2.6, 3.4),
-      new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }),
+      new THREE.PlaneGeometry(2.6 * CAR_SCALE * 1.3, 3.4 * CAR_SCALE * 1.3),
+      new THREE.MeshBasicMaterial({
+        map: tex,
+        transparent: true,
+        depthWrite: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -2,
+      }),
     )
     this.shadow.rotation.x = -Math.PI / 2
     this.shadow.renderOrder = 2
@@ -142,7 +176,10 @@ export class CarModel {
   update(dt: number, car: CarState, pos: THREE.Vector3, heading: number, groundY: number): void {
     // spin out
     if (car.spinT > 0) this.spinAngle += dt * 14
-    else this.spinAngle += (Math.round(this.spinAngle / (Math.PI * 2)) * Math.PI * 2 - this.spinAngle) * Math.min(1, dt * 12)
+    else
+      this.spinAngle +=
+        (Math.round(this.spinAngle / (Math.PI * 2)) * Math.PI * 2 - this.spinAngle) *
+        Math.min(1, dt * 12)
 
     this.root.position.copy(pos)
     this.root.rotation.set(0, heading + this.spinAngle, 0)
@@ -150,7 +187,9 @@ export class CarModel {
     // suspension spring
     const k = 160
     const c = 11
-    const bumpy = car.grounded ? Math.sin(performance.now() * 0.03 + car.s) * 0.004 * (car.speed / 20) : 0
+    const bumpy = car.grounded
+      ? Math.sin(performance.now() * 0.03 + car.s) * 0.004 * (car.speed / 20)
+      : 0
     this.bounceV += (-k * this.bounce - c * this.bounceV) * dt
     this.bounce += this.bounceV * dt
     this.squashV += (-220 * this.squash - 14 * this.squashV) * dt
@@ -160,9 +199,13 @@ export class CarModel {
     this.prevVLat = car.vLat
     const longAcc = (car.speed - this.prevSpeed) / Math.max(dt, 1e-4)
     this.prevSpeed = car.speed
-    const rollT = THREE.MathUtils.clamp(-car.vLat * 0.022, -0.3, 0.3) + car.wall * -0.35 * (car.wall !== 0 ? 1 : 0)
+    const rollT =
+      THREE.MathUtils.clamp(-car.vLat * 0.022, -0.3, 0.3) +
+      car.wall * -0.35 * (car.wall !== 0 ? 1 : 0)
     this.roll += (rollT - this.roll) * Math.min(1, dt * 9)
-    const pitchT = car.grounded ? THREE.MathUtils.clamp(-longAcc * 0.004, -0.12, 0.12) : THREE.MathUtils.clamp(-car.vy * 0.025, -0.4, 0.4)
+    const pitchT = car.grounded
+      ? THREE.MathUtils.clamp(-longAcc * 0.004, -0.12, 0.12)
+      : THREE.MathUtils.clamp(-car.vy * 0.025, -0.4, 0.4)
     this.pitch += (pitchT - this.pitch) * Math.min(1, dt * 8)
 
     this.body.position.y = this.bounce + bumpy

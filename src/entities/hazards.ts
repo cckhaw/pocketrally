@@ -45,7 +45,15 @@ export function makeHazardState(): HazardState {
   }
 }
 
-function cap(st: HazardState, i: number, as: number, ad: number, bs: number, bd: number, r: number) {
+function cap(
+  st: HazardState,
+  i: number,
+  as: number,
+  ad: number,
+  bs: number,
+  bd: number,
+  r: number,
+) {
   const c = st.caps[i]
   c.as = as
   c.ad = ad

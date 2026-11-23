@@ -10,7 +10,16 @@ export function cellarProp(c: PropCtx, kind: string, v: number): boolean {
     case 'corkS':
       for (let i = 0; i < 4; i++) {
         const a = i * 1.7 + v
-        c.cyl(0xc99a5a, 1.0, 1.8, Math.cos(a) * 1.2 * i * 0.6, 0.9, Math.sin(a) * 1.2 * i * 0.6, 0, (i % 2) * 1.4)
+        c.cyl(
+          0xc99a5a,
+          1.0,
+          1.8,
+          Math.cos(a) * 1.2 * i * 0.6,
+          0.9,
+          Math.sin(a) * 1.2 * i * 0.6,
+          0,
+          (i % 2) * 1.4,
+        )
       }
       return true
     case 'cap':
@@ -63,13 +72,28 @@ export function cellarProp(c: PropCtx, kind: string, v: number): boolean {
       return true
     case 'wall':
       c.box(0x5a4638, 1, 24, 30, 0, 12, 0)
-      for (let i = 0; i < 12; i++) c.box(i % 2 ? 0x6a5242 : 0x4f3d30, 0.3, 2.2, 5, 0.6, 1.1 + (i % 6) * 4, (i % 5) * 5.5 - 11)
+      for (let i = 0; i < 12; i++)
+        c.box(i % 2 ? 0x6a5242 : 0x4f3d30, 0.3, 2.2, 5, 0.6, 1.1 + (i % 6) * 4, (i % 5) * 5.5 - 11)
       return true
     case 'hatch': {
       // round hatch window in the wall with a cat peering in
       c.box(0x5a4638, 1.4, 26, 30, 0, 13, 0)
-      c.add(new THREE.TorusGeometry(1, 0.1, 6, 22), 0x7a8088, { x: 0.8, y: 9, ry: Math.PI / 2, sx: 6.5, sy: 6.5, sz: 6.5 })
-      c.add(new THREE.CircleGeometry(1, 20), 0x15202a, { x: 0.78, y: 9, ry: Math.PI / 2, sx: 6.2, sy: 6.2, sz: 1 })
+      c.add(new THREE.TorusGeometry(1, 0.1, 6, 22), 0x7a8088, {
+        x: 0.8,
+        y: 9,
+        ry: Math.PI / 2,
+        sx: 6.5,
+        sy: 6.5,
+        sz: 6.5,
+      })
+      c.add(new THREE.CircleGeometry(1, 20), 0x15202a, {
+        x: 0.78,
+        y: 9,
+        ry: Math.PI / 2,
+        sx: 6.2,
+        sy: 6.2,
+        sz: 1,
+      })
       const cat = new Mini()
       cat.sphere(0xe58a3a, 2.2, 0, 0, 0, 1.15, 1, 0.8)
       cat.cone(0xe58a3a, 0.8, 1.6, -1.5, 1.9, 0)

@@ -89,6 +89,15 @@ export class ChaseCamera {
     this.camera.aspect = aspect
   }
 
+  /** Slow orbit around a stationary car (results screen). */
+  orbit(carPos: THREE.Vector3, t: number): void {
+    this.camera.position.set(carPos.x + Math.sin(t) * 7, carPos.y + 3.2, carPos.z + Math.cos(t) * 7)
+    this.camera.lookAt(carPos.x, carPos.y + 0.6, carPos.z)
+    this.camera.fov = fovForAspect(55, this.aspect)
+    this.camera.updateProjectionMatrix()
+    this.first = true
+  }
+
   snap(): void {
     this.first = true
   }
@@ -108,14 +117,18 @@ export class ChaseCamera {
     boost: number,
     ceiling: number,
   ): void {
-    const back = 3.1
-    const up = 1.55
+    const back = 3.2
+    const up = 1.6
     // look-ahead: shift the look target sideways into turns
     const rx = -fz
     const rz = fx
     const lookAhead = 7
     const bias = Math.max(-1.2, Math.min(1.2, curve * 55))
-    this.desired.set(carPos.x - fx * back, carPos.y + Math.min(up, Math.max(0.7, ceiling - 0.5)), carPos.z - fz * back)
+    this.desired.set(
+      carPos.x - fx * back,
+      carPos.y + Math.min(up, Math.max(0.7, ceiling - 0.5)),
+      carPos.z - fz * back,
+    )
     this.lookT.set(
       carPos.x + fx * lookAhead + rx * bias,
       carPos.y + 0.5,
