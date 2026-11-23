@@ -178,5 +178,6 @@ export const cellarLevel: LevelConfig = {
     saturation: 1.1,
     contrast: 1.08,
     bloom: 0.45,
+    ceiling: { y: 27, color: 0x2a1a10 },
   },
 }

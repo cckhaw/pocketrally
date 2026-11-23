@@ -6,9 +6,10 @@ attribute vec4 aColor;
 varying vec4 vColor;
 uniform float uScale;
 void main() {
-  vColor = aColor;
   vec4 mv = modelViewMatrix * vec4(position, 1.0);
-  gl_PointSize = aSize * uScale / max(0.5, -mv.z);
+  // fade out particles that get very close to the camera so they never fill the screen
+  vColor = vec4(aColor.rgb, aColor.a * smoothstep(0.8, 3.0, -mv.z));
+  gl_PointSize = min(aSize * uScale / max(0.5, -mv.z), 120.0);
   gl_Position = projectionMatrix * mv;
 }`
 const FRAG = /* glsl */ `
@@ -19,6 +20,8 @@ void main() {
   float a = smoothstep(0.5, 0.15, d);
   gl_FragColor = vec4(vColor.rgb, vColor.a * a);
   if (gl_FragColor.a < 0.01) discard;
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }`
 
 /** Pooled point particles: one draw call, zero allocations after construction. */

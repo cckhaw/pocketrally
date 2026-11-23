@@ -15,7 +15,7 @@ export class Trail {
   active = false
   private width: number
 
-  constructor(points = 90, width = 0.32) {
+  constructor(points = 90, width = 0.26) {
     this.n = points
     this.width = width
     this.pos = new Float32Array(points * 2 * 3)
@@ -88,7 +88,7 @@ export class Trail {
     }
     for (let i = 0; i < this.n; i++) {
       this.ages[i] += dt
-      const a = Math.max(0, 0.5 - this.ages[i] * 0.16)
+      const a = Math.max(0, 0.38 - this.ages[i] * 0.12)
       for (let k = 0; k < 2; k++) {
         const o = (i * 2 + k) * 4
         this.col[o] = 0.08

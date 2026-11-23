@@ -83,6 +83,8 @@ export interface Theme {
   saturation: number
   contrast: number
   bloom: number
+  /** Optional ceiling (indoor levels): plane plus rafters at this height. */
+  ceiling?: { y: number; color: number }
 }
 
 export interface LevelConfig {

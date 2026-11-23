@@ -97,6 +97,13 @@ export async function buildLevelView(
       await tick()
     }
   }
+  if (th.ceiling) {
+    // rafters every 14 units keep the ceiling readable and the cellar feeling enclosed
+    for (let s = 0; s < track.length; s += 14) {
+      ctx.place(s, 0, 0)
+      ctx.box(th.ceiling.color, 150, 1.4, 1.6, 0, th.ceiling.y - 0.7, 0)
+    }
+  }
   addCheckpointFlags(level, track, ctx)
   addFinishGate(level, track, ctx, checker, meshes.group)
   const staticMat = new THREE.MeshStandardMaterial({
@@ -139,6 +146,15 @@ export async function buildLevelView(
     return Math.atan2(p.tx, -p.tz)
   })
 
+  if (th.ceiling) {
+    const ceil = new THREE.Mesh(
+      new THREE.PlaneGeometry(4000, 4000),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color(th.ceiling.color).multiplyScalar(0.8) }),
+    )
+    ceil.rotation.x = Math.PI / 2
+    ceil.position.y = th.ceiling.y
+    scene.add(ceil)
+  }
   const hazards = new HazardViews(level, track)
   scene.add(hazards.group)
   progress(0.9)

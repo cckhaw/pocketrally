@@ -27,8 +27,9 @@ export function createClient({
       let res
       try {
         res = await fetchImpl(url, { method, headers: { Authorization: `Bearer ${token}` } })
-      } catch (err) {
-        if (attempt >= maxRetries) throw new Error(`network error calling ${method} ${path}`)
+      } catch (cause) {
+        if (attempt >= maxRetries)
+          throw new Error(`network error calling ${method} ${path}`, { cause })
         await sleep(backoff(attempt++))
         continue
       }
