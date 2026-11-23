@@ -1,0 +1,19 @@
+{
+  "id": "pocket-rally",
+  "title": "Pocket Rally",
+  "shortDescription": "Drive a tiny toy RC car through giant gardens, living rooms and pub cellars. Beat the clock, collect tokens, climb the global leaderboard.",
+  "tags": ["racing", "3d", "arcade", "time-trial", "leaderboard"],
+  "devices": ["mobile", "tablet", "desktop"],
+  "orientation": "any",
+  "thumbnail": "thumbnail.png",
+  "version": "1.0.0",
+  "entry": "./",
+  "embed": {
+    "query": "?embed=1",
+    "iframeAllow": "fullscreen; accelerometer; gyroscope; autoplay",
+    "messages": {
+      "fromGame": ["pocket-rally:ready", "pocket-rally:score"],
+      "toGame": ["pocket-rally:pause", "pocket-rally:resume"]
+    }
+  }
+}
