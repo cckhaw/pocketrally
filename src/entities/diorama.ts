@@ -60,7 +60,7 @@ export function buildDiorama(renderer: THREE.WebGLRenderer): Diorama {
   disc.receiveShadow = true
   turntable.add(disc)
   const car = new CarModel()
-  car.root.scale.setScalar(1.6)
+  car.root.scale.setScalar(1.3)
   car.root.position.y = 0.4
   turntable.add(car.root)
   scene.add(turntable)
@@ -85,11 +85,11 @@ export function buildDiorama(renderer: THREE.WebGLRenderer): Diorama {
   }
   put('onion', -13, -10, 0.4, 1.3)
   put('onion', 14, -14, 1, 1.5)
-  put('sneakerS', 12, 7, 2.2)
-  put('ballS', -12, 9, 0, 1)
+  put('sneakerS', 14, 4, 2.2)
+  put('ballS', -13, 6, 0, 1)
   put('flower', -7, -16, 0, 1.2)
   put('stalk', 20, -2, 0)
-  put('corkS', 8, 12, 0.5)
+  put('corkS', 6, 8, 0.5)
   put('barrel', -17, 0, 0)
   const staticMat = new THREE.MeshStandardMaterial({
     vertexColors: true,
@@ -100,7 +100,7 @@ export function buildDiorama(renderer: THREE.WebGLRenderer): Diorama {
   scene.add(props)
 
   const cork = corkModel()
-  cork.position.set(5.5, 0, 4)
+  cork.position.set(-7, 0, -3)
   cork.scale.setScalar(1.5)
   scene.add(cork)
   const foot = footModel()
@@ -119,9 +119,9 @@ export function buildDiorama(renderer: THREE.WebGLRenderer): Diorama {
       turntable.rotation.y = t * 0.5
       foot.position.y = 6 + Math.abs(Math.sin(t * 0.8)) * 2
       cork.rotation.y = t * 0.3
-      const r = aspect < 1 ? 15 : 11
+      const r = aspect < 1 ? 15 : 12
       camera.position.set(Math.sin(t * 0.12) * r, aspect < 1 ? 6 : 3.6, Math.cos(t * 0.12) * r)
-      camera.lookAt(0, aspect < 1 ? -2.2 : -2.6, 0)
+      camera.lookAt(0, aspect < 1 ? -1.4 : -0.5, 0)
       car.update(
         dt,
         {

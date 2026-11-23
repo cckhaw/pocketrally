@@ -19,7 +19,7 @@ import { Input } from './input'
 import type { Params } from './params'
 import { PRESETS, QualityScaler, type QualityLevel } from './quality'
 import { Run, buildTrack, starsFor } from './run'
-import { isLevelUnlocked, load, persist, recordBest, sanitizeNickname } from './save'
+import { load, persist, recordBest, sanitizeNickname } from './save'
 import type { Track } from './track'
 import { makeTrackPoint } from './track'
 
@@ -116,6 +116,30 @@ export class Game implements GameApi {
     this.resize()
   }
 
+  /** Snapshot for tests and the debug overlay. */
+  debugState(): {
+    state: GameState
+    level: string
+    s: number
+    d: number
+    timeMs: number
+    tokens: number
+    deaths: number
+    speed: number
+  } {
+    const r = this.run
+    return {
+      state: this.state,
+      level: this.levelId,
+      s: r?.car.s ?? 0,
+      d: r?.car.d ?? 0,
+      timeMs: r?.timeMs ?? 0,
+      tokens: r?.tokenCount ?? 0,
+      deaths: r?.deaths ?? 0,
+      speed: r?.car.speed ?? 0,
+    }
+  }
+
   attachUI(ui: UI): void {
     this.ui = ui
   }
@@ -134,15 +158,14 @@ export class Game implements GameApi {
   // ---------- GameApi ----------
   levels(): LevelInfo[] {
     const save = load()
-    return LEVELS.map((l, i) => {
+    return LEVELS.map((l) => {
       const best = save.bests[l.id]
       return {
         id: l.id,
         name: l.name,
         tagline: l.tagline,
         order: l.order,
-        locked:
-          !isLevelUnlocked(l.order, i > 0 ? LEVELS[i - 1].id : null) && !this.params.autostart,
+        locked: false,
         bestMs: best?.timeMs ?? null,
         stars: best?.stars ?? 0,
         tokens: best?.tokens ?? 0,
@@ -209,6 +232,12 @@ export class Game implements GameApi {
     if (!ld) return
     this.run = new Run(ld.level, ld.track)
     this.run.sensitivity = load().settings.sensitivity
+    if (this.params.startS > 0) {
+      const cps = ld.level.checkpoints.filter((c) => c <= this.params.startS)
+      this.run.car.s = this.params.startS
+      this.run.checkpointS = cps.length ? cps[cps.length - 1] : 0
+      this.run.checkpointIndex = cps.length - 1
+    }
     this.fx.reset()
     this.carModel.root.visible = true
     this.prev = { s: 0, d: 0, y: 0, yaw: 0 }

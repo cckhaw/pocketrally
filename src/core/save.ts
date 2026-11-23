@@ -119,11 +119,6 @@ export function recordBest(
   return better
 }
 
-export function isLevelUnlocked(order: number, prevId: string | null): boolean {
-  if (order <= 1 || !prevId) return true
-  return !!load().bests[prevId]
-}
-
 export function sanitizeNickname(raw: string): string {
   return raw.replace(/\s+/g, ' ').trim().slice(0, 16)
 }
